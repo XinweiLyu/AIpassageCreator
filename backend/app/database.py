@@ -18,8 +18,8 @@ engine = create_engine(
 # 会话工厂
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # 创建db session
 
-# ORM 模型基类，模型是表的映射
-Base = declarative_base()
+# ORM 模型基类 ，可以把数据库表映射为Python类
+Base = declarative_base() 
 
 # databases 异步数据库（用于 FastAPI 异步查询）
 database = Database(settings.database_url.replace("+pymysql", ""))
