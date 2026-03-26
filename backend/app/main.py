@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
     print(f"数据库连接成功: {settings.database_url}")
     print(f"Redis 连接成功: {settings.redis_url}")
     
-    yield # 分隔启动和关闭逻辑。 
+    yield
     
     # 关闭时执行
     await database.disconnect()
@@ -29,10 +29,9 @@ async def lifespan(app: FastAPI):
     print("应用已关闭")
 
 
-
 # 创建 FastAPI 应用
 app = FastAPI(
-    title="AI 文章创作器",
+    title="AI 爆款文章创作器",
     description="基于多智能体编排的 AI 文章创作平台",
     version="0.0.1",
     lifespan=lifespan
@@ -42,7 +41,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  # 前端开发服务器地址
-    allow_credentials=True, # 允许跨域请求携带Cookie
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -79,3 +78,23 @@ async def global_exception_handler(request: Request, exc: Exception):
 # 注册路由
 app.include_router(health_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+
+
+@app.get("/")
+async def root():
+    """根路径"""
+    return {
+        "message": "AI 文章创作器 - Python 后端",
+        "version": "0.0.1",
+        "docs": "/docs"
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "app.main:app",
+        host=settings.server_host,
+        port=settings.server_port,
+        reload=True
+    )
