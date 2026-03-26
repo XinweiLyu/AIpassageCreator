@@ -1,15 +1,18 @@
-"""密码工具。"""
+"""密码加密工具"""
 
-from passlib.context import CryptContext
-
+import hashlib
 from app.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def encrypt_password(password: str) -> str:
+    """
+    加密密码（MD5 + 盐值）
+    与 Java 版本保持一致：MD5(password + salt)
+    """
+    salted_password = password + settings.password_salt
+    return hashlib.md5(salted_password.encode()).hexdigest()
 
 
-def hash_password(raw_password: str) -> str:
-    return pwd_context.hash(f"{raw_password}{settings.password_salt}")
-
-
-def verify_password(raw_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(f"{raw_password}{settings.password_salt}", hashed_password)
+def verify_password(plain_password: str, encrypted_password: str) -> bool:
+    """验证密码"""
+    return encrypt_password(plain_password) == encrypted_password

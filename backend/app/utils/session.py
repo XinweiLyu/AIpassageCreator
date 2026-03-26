@@ -30,7 +30,7 @@ def _get_session_key(session_id: str) -> str:
     """获取 Session Key"""
     return f"session:{session_id}"
 
-
+    
 async def get_session(session_id: str) -> Optional[dict]:
     """获取 Session 数据"""
     if not redis_client:
