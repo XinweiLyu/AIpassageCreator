@@ -1,4 +1,4 @@
-"""用户路由"""
+"""用户路由 FastAPI 路由"""
 
 from typing import Optional
 from fastapi import APIRouter, Depends, Response
@@ -29,7 +29,7 @@ async def register(
     db: Database = Depends(get_db)
 ):
     """用户注册"""
-    service = UserService(db)
+    service = UserService(db) 
     user_id = await service.register(request)
     return BaseResponse.success(data=user_id, message="注册成功")
 

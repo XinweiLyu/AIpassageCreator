@@ -35,19 +35,41 @@ class Settings(BaseSettings):
     
     # 密码加密盐值
     password_salt: str
-    
+
+    # 模型配置
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore"
     )
-    
+
+    # AI 模型配置
+    dashscope_api_key: str
+    dashscope_model: str
+
+    # pexels 配置
+    pexels_api_key: str
+
+    # 腾讯云配置
+    tencent_cos_secret_id: str
+    tencent_cos_secret_key: str
+    tencent_cos_region: str
+    tencent_cos_bucket: str
+    tencent_cos_domain: str=""
+
+
+
+
+
+
+    # 获取数据库连接 URL
     @property
     def database_url(self) -> str:
         """获取数据库连接 URL"""
         return f"mysql+pymysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}?charset=utf8mb4"
     
+    # 获取 Redis 连接 URL
     @property
     def redis_url(self) -> str:
         """获取 Redis 连接 URL"""

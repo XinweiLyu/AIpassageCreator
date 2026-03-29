@@ -1,4 +1,4 @@
-"""用户相关请求/响应模型"""
+"""用户相关请求/响应模型  Pydantic 模型"""
 
 from typing import Optional
 from pydantic import BaseModel, Field

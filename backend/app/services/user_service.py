@@ -47,8 +47,8 @@ class UserService:
         # 检查账号是否已存在
         query = select(func.count(User.id)).where(
             and_(User.user_account == request.user_account, User.is_delete == 0)
-        )
-        count = await self.db.fetch_val(query)
+        ) 
+        count = await self.db.fetch_val(query) # fetch_val() 是数据库查询方法, 用于查询数据库中是否存在该账号.
         throw_if(count > 0, ErrorCode.USER_ALREADY_EXIST, "账号已存在")
         
         # 加密密码
