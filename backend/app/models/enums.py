@@ -36,4 +36,4 @@ class SseMessageTypeEnum(str, Enum):
     
     def get_streaming_prefix(self) -> str:
         """获取流式输出消息前缀"""
-        return f"{self.value}:"
+        return f"{self.value}:" # 例如 "AGENT2_STREAMING:"

@@ -248,10 +248,11 @@ class ArticleAgentService:
             if chunk.choices[0].delta.content:
                 content = chunk.choices[0].delta.content
                 content_builder.append(content)
+                # "靠前缀快速识别“这条是哪个通道的数据”，再决定显示到哪里 eg"AGENT2_STREAMING: content ....
                 stream_handler(message_type.get_streaming_prefix() + content)
         
         return "".join(content_builder)
-    
+
     def _parse_json_response(self, content: str, name: str, is_list: bool = False) -> dict or list:
         """解析 JSON 响应"""
         try:

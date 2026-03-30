@@ -23,7 +23,7 @@ from app.config import settings
 async def main() -> None:
     client = AsyncOpenAI(
         api_key=settings.dashscope_api_key,
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1", 
     )
 
     # 非流式调用
@@ -42,7 +42,7 @@ async def main() -> None:
         stream=True,
     )
     async for chunk in stream:
-        if chunk.choices[0].delta.content:
+        if chunk.choices[0].delta.content: 
             print(chunk.choices[0].delta.content, end="", flush=True)
     print()
 
