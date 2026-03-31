@@ -16,7 +16,7 @@ class PexelsService:
 
     def __init__(self):
         self.api_key = settings.pexels_api_key
-        self.client = httpx.AsyncClient(timeout=30.0)
+        self.client = httpx.AsyncClient(timeout=30.0) # 异步HTTP客户端，超时30秒
 
     async def search_image(self, keywords: str) -> Optional[str]:
         """
@@ -32,7 +32,7 @@ class PexelsService:
             url = self._build_search_url(keywords)
 
             headers = {"Authorization": self.api_key}
-            response = await self.client.get(url, headers=headers)
+            response = await self.client.get(url, headers=headers) # 发送GET请求
 
             if response.status_code != 200:
                 logger.error(f"Pexels API 调用失败: {response.status_code}")
@@ -51,6 +51,7 @@ class PexelsService:
         """获取降级图片"""
         return ArticleConstant.PICSUM_URL_TEMPLATE.format(position)
 
+    # 拼接请求地址 eghttps://api.pexels.com/v1/search?query=AI technology office modern&per_page=1&orientation=landscape
     def _build_search_url(self, keywords: str) -> str:
         """构建搜索 URL"""
         return (

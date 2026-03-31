@@ -89,8 +89,8 @@ class ArticleAgentService:
         """智能体1：生成标题"""
         prompt = PromptConstant.AGENT1_TITLE_PROMPT.replace("{topic}", state.topic)
         
-        content = await self._call_llm(prompt)
-        title_data = self._parse_json_response(content, "标题")
+        content = await self._call_llm(prompt) 
+        title_data = self._parse_json_response(content, "标题") 
         state.title = TitleResult(**title_data)
         logger.info(f"智能体1：标题生成成功, mainTitle={state.title.main_title}")
     
@@ -110,7 +110,7 @@ class ArticleAgentService:
             prompt, stream_handler, SseMessageTypeEnum.AGENT2_STREAMING
         )
         outline_data = self._parse_json_response(content, "大纲")
-        sections = [OutlineSection(**section) for section in outline_data["sections"]]
+        sections = [OutlineSection(**section) for section in outline_data["sections"]] # list[OutlineSection]
         state.outline = OutlineResult(sections=sections)
         logger.info(f"智能体2：大纲生成成功, sections={len(state.outline.sections)}")
     
@@ -120,8 +120,8 @@ class ArticleAgentService:
         stream_handler: Callable[[str], None]
     ):
         """智能体3：生成正文（流式输出）"""
-        outline_text = json.dumps(
-            [section.model_dump() for section in state.outline.sections],
+        outline_text = json.dumps( # 把列表转成json格式字符串
+            [section.model_dump() for section in state.outline.sections], # 把每个 OutlineSection（Pydantic对象）转成普通字典list[dict]
             ensure_ascii=False
         )
         prompt = (
@@ -146,8 +146,8 @@ class ArticleAgentService:
         )
         
         content = await self._call_llm(prompt)
-        requirements_data = self._parse_json_response(content, "配图需求", is_list=True)
-        state.image_requirements = [ImageRequirement(**req) for req in requirements_data]
+        requirements_data = self._parse_json_response(content, "配图需求", is_list=True)# list[dict]
+        state.image_requirements = [ImageRequirement(**req) for req in requirements_data] # list[ImageRequirement]
         logger.info(f"智能体4：配图需求分析成功, count={len(state.image_requirements)}")
     
     async def agent5_generate_images(
@@ -170,12 +170,12 @@ class ArticleAgentService:
             # 降级策略
             method = self.pexels_service.get_method()
             if image_url is None:
-                image_url = self.pexels_service.get_fallback_image(requirement.position)
+                image_url = self.pexels_service.get_fallback_image(requirement.position) # 取兜底图
                 method = ImageMethodEnum.PICSUM
                 logger.warning(f"智能体5：图片检索失败, 使用降级方案, position={requirement.position}")
             
             # 使用图片直接 URL（MVP 阶段不上传到 COS，简化流程）
-            final_image_url = self.cos_service.use_direct_url(image_url)
+            final_image_url = self.cos_service.use_direct_url(image_url) # 使用图片直接 URL
             
             # 创建配图结果
             image_result = self._build_image_result(requirement, final_image_url, method)
@@ -208,13 +208,13 @@ class ArticleAgentService:
         full_content_lines = []
         
         # 按行处理正文，在章节标题后插入对应图片
-        lines = content.split("\n")
+        lines = content.split("\n") # 拆开正文按行
         for line in lines:
-            full_content_lines.append(line)
-            
+            full_content_lines.append(line) # 把每行添加到full_content_lines列表        
+            # 如果行以 ## 开头，则认为是章节标题
             if line.startswith("## "):
-                section_title = line[3:].strip()
-                self._insert_image_after_section(full_content_lines, images, section_title)
+                section_title = line[3:].strip() # 去掉 ## 和空格
+                self._insert_image_after_section(full_content_lines, images, section_title) # 在章节标题后插入对应图片
         
         state.full_content = "\n".join(full_content_lines)
         logger.info(f"图文合成完成, fullContentLength={len(state.full_content)}")
@@ -227,6 +227,7 @@ class ArticleAgentService:
             model=self.model,
             messages=[{"role": "user", "content": prompt}]
         )
+        # 返回的响应内容是json格式字符串，根据prompt 
         return response.choices[0].message.content
     
     async def _call_llm_with_streaming(
@@ -256,6 +257,7 @@ class ArticleAgentService:
     def _parse_json_response(self, content: str, name: str, is_list: bool = False) -> dict or list:
         """解析 JSON 响应"""
         try:
+            #  将json格式字符串转换为python对象
             return json.loads(content)
         except json.JSONDecodeError as e:
             logger.error(f"{name}解析失败, content={content}, error={e}")
@@ -288,6 +290,7 @@ class ArticleAgentService:
             if (image.position > 1 and 
                 image.section_title and 
                 section_title in image.section_title.strip()):
+                # 在章节标题后插入对应图片 eg\n![示意图](https://a.com/1.jpg)
                 full_content_lines.append(f"\n![{image.description}]({image.url})")
                 break
     
